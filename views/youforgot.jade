@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    div.container.createaccount-container
+        form(role="form" class="form-createaccount" method="post" action="/youforgot" data-validate="parsley" novalidate)
+            center
+                h2(class="form-createaccount-heading") Forgot credentials
+                if message
+                    p
+                        font(color="#{color}") #{message}
+            input(name="username" type="text" class="form-control" placeholder="Username or Email address" required autofocus)
+            br
+            button(class="btn btn-lg btn-primary btn-block" type="submit") Request new credentials

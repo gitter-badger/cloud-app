@@ -1,0 +1,79 @@
+extends layout_map_noheader
+
+block content
+    script(type="text/javascript").
+        var $ = window.parent.$;
+        $(document).on('map_initialized',function(){window.map.setOptions({draggable:false,zoomControl:false,scrollwheel:false,disableDoubleClickZoom:true});});
+    div.container
+        div.row-small
+            div.col-md-4
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Map
+                    div.panel-body
+                        div#location-map-div
+                            div#map-canvas
+            div.col-lg-8
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title
+                            if fencelog.locationId
+                                | #{fencelog.locationId}
+                            else
+                                | No location Id specified
+                    div.panel-body
+                        | This location namely
+                        b  #{fencelog.locationId} 
+                        | has been 
+                        if fencelog.eventType === "enter"
+                            b entered
+                        else if fencelog.eventType === "exit"
+                            b left
+                        else
+                            b visited
+                        |  using 
+                        b #{fencelog.origin}
+                        |  on 
+                        b #{fencelog.created_at_date}
+                        |  at 
+                        b #{fencelog.created_at_time}
+                        | .
+                        br
+                        | It's exact GPS position is lon 
+                        b #{fencelog.location[0]}
+                        |  and lat 
+                        b #{fencelog.location[1]}
+                        | .
+            div.col-lg-8
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title HTTP Resultlog
+                    div.panel-body
+                        if fencelog.httpUrl && fencelog.httpMethod
+                            | There has been made a 
+                            b #{fencelog.httpMethod}
+                            |  request to the following URI 
+                            b #{fencelog.httpUrl}
+                            | .
+                            br
+                            | The Server responded with a 
+                            b #{fencelog.httpResponseCode}
+                            | .
+                            br
+                            | Here's the full output of this call:
+                            br
+                            b #{fencelog.httpResponse}
+                        else
+                            | No Results
+    if fencelog
+        script(type="text/javascript").
+            $(document).bind('map_initialized', function(){
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(#{fencelog.location[1]},#{fencelog.location[0]}),
+                    map: window.map,
+                    title: '#{fencelog._id}',
+                    icon: '/images/marker-universal.png'
+                });
+                window.map.setCenter(marker.position);
+                window.map.setZoom(15);
+            });

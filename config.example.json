@@ -1,0 +1,27 @@
+{
+    "hostname": "0.0.0.0:3000",
+    "servername": "Demo Node",
+
+    "redis_url": "",
+
+    "mongodb_server": "localhost",
+    "mongodb_port": 27017,
+    "mongodb_username": null,
+    "mongodb_password": null,
+    "mongodb_dbname": "geofancy",
+
+    "status_mail_recipient": "support@geofancy.com",
+
+    "mail_from": "support@geofancy.com",
+    "mail_server": "smtp.server.com",
+    "mail_user": "john@doe.org",
+    "mail_password": "j0hnnyb0y",
+
+    "fb_app_id": "",
+    "fb_app_secret": "",
+    "fb_auth_callback": "",
+
+    "tw_consumer_key": "",
+    "tw_consumer_secret": "",
+    "tw_auth_callback": ""
+}

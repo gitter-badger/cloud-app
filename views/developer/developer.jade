@@ -1,0 +1,270 @@
+extends ../layout
+
+block content
+    link(rel="stylesheet" href="/stylesheets/sidebar.css")
+    link(rel="stylesheet" href="/stylesheets/prettify.css")
+    link(rel="stylesheet" href="/stylesheets/prettify-desert.css")
+    script(src='/javascripts/prettify/prettify.js')
+    script(type="text/javascript").
+        $(document).ready(function(){
+            $('body').attr('data-spy', 'scroll');
+            $('body').attr('data-target', '#sidebar');
+            var colorboxConfig = {iframe: true, width: '800px', height: '80%', opacity: 0.6, fixed: true};
+            $('.edit-app').colorbox(colorboxConfig);
+            $('.add-app').colorbox(colorboxConfig);
+            window.prettyPrint && prettyPrint();
+        });
+        function removeApp(id) {
+            swal({title:'Remove App',text:'Would you really like to remove this App? Be aware: All access token and authorization codes will be revoked!',type:'warning',showCancelButton:true},function(){window.location.href='/developer?remove_app='+id;});
+        }
+    div.container.bs-docs-container
+        div.row
+            div.col-md-3
+                div(id="sidebar" class="bs-sidebar hidden-print affix" role="complementary")
+                    ul(class="nav bs-sidenav")
+                        if locals.session.passport.user
+                            li.active
+                                a(href="#apps") Your Apps
+                                ul.nav
+                                    li
+                                        a(href="#apps-list") List
+                        li(class=(!locals.session.passport.user ? 'active' : ''))
+                            a(href="#oauth2") oAuth v2 API
+                            ul.nav
+                                li
+                                    a(href="#oauth2-introduction") Introduction
+                                li
+                                    a(href="#oauth2-endpoints") API Endpoints
+                        li
+                            a(href="#socketio") Socket.io API
+                            ul.nav
+                                li
+                                    a(href="#socketio-introduction") Introduction
+                        li
+                            a(href="#mqtt-broker") MQTT Broker
+            div.col-md-9
+                h1(id="apps") Geofancy Developer Center
+                if locals.session.passport.user
+                    div(class="apps-container" id="apps-list")
+                        p Here you can manage your oAuth v2 Apps.
+                        div
+                            table.table.table-stripped
+                                tr
+                                    th Name
+                                    th Redirect URI
+                                    th Added
+                                    th
+                                for client, i in clients
+                                    tr
+                                        td #{client.name}
+                                        td #{client.redirectUri}
+                                        td #{client.created_at_formatted}
+                                        td
+                                            a(href="/developer/app/#{client._id}" class="edit-app") View / Edit
+                                            | &nbsp; | &nbsp;
+                                            a(href="#" onclick="removeApp('#{client._id}')") Remove
+                                tr
+                                    td &nbsp;
+                                    td &nbsp;
+                                    td &nbsp;
+                                    td
+                                        a(href="/developer/app/create" class="add-app") Create a new App
+                h2(id="oauth2") oAuth v2 API Documentation
+                h3(id="oauth2-introduction") Introduction
+                p
+                    b Geofancy&nbsp;
+                    | provides an oAuth v2 API for public use.
+                    br
+                    | The public endpoint can be found at the following REST url&nbsp;
+                    pre.prettyprint
+                        | https://my.geofancy.com/api/v1
+                    | Authentication is done via oAuth v2, to use this API you need a valid&nbsp;
+                    code access_token
+                    |  .
+                    br
+                    | All requests agains this API are client bound which means that you need to create a client using this developer portal. When retrieving the access token you must specify your App's&nbsp;
+                    code client_id
+                    |  .
+                    br
+                    br
+                    | Obtaining an access token is quiet easy, just head over to the oAuth v2 authentication dialog using your client credentials&nbsp;
+                    pre.prettyprint
+                        | https://my.geofancy.com/oauth2/authorize
+                        | ?response_type=[grant type]
+                        | &client_id=[your client id]
+                        | &redirect_uri=[your redirect uri]
+                    | Currently&nbsp;
+                    code token
+                    |  and&nbsp;
+                    code code&nbsp;
+                    | are both accepted grant types.
+                    br
+                    | For further information on how to deal with the oAuth v2 protocol, please refer to the offical&nbsp;
+                    a(href="http://oauth.net/2/") oAuth v2 specification.
+                    br
+                    br
+                    | After you've retrieved your access token, you may perform API requests with the access token as an&nbsp;
+                    code Authorization: Bearer [your access token]&nbsp;
+                    | in your HTTP request's header.
+                    br
+                    | Despite transmitting the Bearer Token in your request's header is highly recommended, it is also possible to use the&nbsp;
+                    code ?access_token=[your access token]
+                    |  .
+                h3(id="oauth2-endpoints") API Endpoints
+                p
+                    | These are the endpoints currently available for public use.
+                    br
+                    | For retrieving your account information use the&nbsp;
+                    code /user&nbsp;
+                    |  endpoint e.g.:&nbsp;
+                    pre.prettyprint
+                        | GET https://my.geofancy.com/api/v1/user
+                    | To retrieve all of your Fencelogs, use the&nbsp;
+                    code /fencelogs&nbsp;
+                    | endpoint:&nbsp;
+                    pre.prettyprint
+                        | GET https://my.geofancy.com/api/v1/fencelogs
+                    | To get your Schedules (which are resulting from your Fencelogs) use&nbsp;
+                    code /schedules&nbsp;
+                    |  endpoint e.g.:&nbsp;
+                    pre.prettyprint
+                        | GET https://my.geofancy.com/api/v1/schedules?from=
+                        i [Unix Timestamp]
+                        | &to=
+                        i [Unix Timestamp]
+                    | Both the&nbsp;
+                    b from&nbsp;
+                    | and the&nbsp;
+                    b to&nbsp;
+                    | Parameters are mandatory. If they are left away, there will be no Schedules found, which results in a&nbsp;
+                    b 404&nbsp;
+                    | HTTP-Status Code sent to your Client.
+                    br
+                    | As soon as some Schedules are found, the Response will look as follows:
+                  pre.prettyprint
+                    | [
+                    |  {
+                    |    locationId: "Home Sweet Home",
+                    |    checkIn: "2014-06-18T16:43:18.075Z",
+                    |    checkOut: "2014-06-18T18:30:20.385Z",
+                    |    stay: 6422
+                    |  },
+                    |  {
+                    |    ...
+                    |  }
+                    | ]
+                b locationId&nbsp;
+                | corresponds to your custom Location-ID&nbsp;
+                b checkIn&nbsp;
+                | is the UTC Date of the corresponding Fencelog's&nbsp;
+                i enter&nbsp;
+                | event, whereas&nbsp;
+                b checkOut&nbsp;
+                | corresponds to it's&nbsp;
+                i exit&nbsp;
+                | event. Finally&nbsp;
+                b stay&nbsp;
+                | symbolizes the time in seconds which you've been visiting that location.
+                h2(id="socketio") Socket.io API
+                h3(id="socketio-introduction") Introduction
+                p
+                    b Geofancy&nbsp;
+                    | also provides a Socket.io API which may (currently) only be used by one client per account at a time. Which shall be fairly enough.
+                    | Using Geofancy's Socket.io API is fairly easy, just make sure to establish a connection using any compatible Socket.io Client (take a look at
+                    a(href="http://socket.io/") their official page
+                    | ) to get in touch with it.
+                    br
+                    | We're also offering a very plain and simple example over at our
+                    a(href="https://github.com/Geofancy/geofancy-socket-sample" target="_blank") GitHub page
+                    | .
+                    br
+                    | The endpoint you'll actually use to establish a connection to is
+                    pre.prettyprint https://my.geofancy.com:443
+                    | A connection using the JavaScript Socket.io Library looks as follows:
+                    pre.prettyprint var socket = io.connect('https://my.geofancy.com:443');
+                    | You may then authenticate by submitting your
+                    b  credentials
+                    | :
+                    pre.prettyprint
+                        | socket.emit('session', {username: 'YOUR_USERNAME', password:'YOUR_PASSWORD'});
+                        | socket.on('session', function (data) {
+                        |   console.log(data);
+                        | });
+                    | you'll get an session_id in case the authentication was successful
+                    pre.prettyprint {session_id: "966f3e37aa1cf6ad634bc8912d7e8386e28e70b4"}
+                    | or an error in case it was invalid
+                    pre.prettyprint {error: "invalid credentials"}
+                    | Nothing to do with that session_id as long as your session persists you'll receive events like e.g.
+                    pre.prettyprint
+                        | socket.on('fencelog', function (data) {
+                        |   if (data.event === 'add') {
+                        |       var fencelog = data.fencelog;
+                        |       // Your fencelog and you
+                        |   } else if (data.event === 'list') {
+                        |       var fencelogs = data.fencelogs;
+                        |       for (var i = fencelogs.length - 1; i >= 0; i--) {
+                        |           var fencelog = fencelogs[i];
+                        |           // Do whatever you want with the fencelog
+                        |       };
+                        |    }
+                        | });
+                    | Current the list event can be emitted manually by using the&nbsp;
+                    code https://my.geofancy.com/api/socket.io/fencelogs
+                    | &nbsp;(authentication needed) endpoint which will just emit all your current Fencelogs for testing purpose.
+                    br
+                    | As soon as a Fencelogs is added the add event is emitted providing the Fecenlogs's data to you.
+                h2#mqtt-broker MQTT Broker
+                p
+                    b Geofancy&nbsp;
+                    | has an integrated MQTT Broker which can be used to subscribe / published to custom topics.
+                    br
+                    | The broker operates on&nbsp;
+                    code my.geofancy.com:1883
+                    | &nbsp;currently authentication is possible using either
+                    code Plain
+                    | &nbsp; or&nbsp;
+                    code SHA1
+                    | &nbsp; encryption.
+                    br
+                p
+                    | To dispatch messages either use a Client, check out the Node.js Sample on&nbsp;
+                    a(href='https://github.com/Geofancy/geofancy-nodejs-mqtt-sample' target='_blank') GithHub
+                    | &nbsp;or use your Home-Automation Devices.
+                    br
+                    | If you'd like to take a peek at the messages sent from / to your Topics, just got to&nbsp;
+                    a(href='/account/mqtt') MQTT
+                    | &nbsp;and check them out.
+                p
+                    | You may also delete old / unused topics there. Please take into account that, if deleting Topics messages might still be delivered to your devices depending on the selected&nbsp;
+                    code QoS
+                    | &nbsp;Currently the available Qualities of Service are&nbsp;
+                    code QoS 0
+                    | &nbsp;and&nbsp;
+                    code QoS 1
+                    | &nbsp;.
+                p
+                    | When publishing / subscribing to topics, it's vital to prefix them with your Username and a trailing slash e.g.&nbsp;
+                    code USERNAME/
+                    br
+                    | A User named&nbsp;
+                    code JohnDoe
+                    | &nbsp; could have a topic like this&nbsp;
+                    code JohnDoe/HeatingLevel1
+                    | . You may only subscribe / publish to topics prefixed with your Username.
+                p
+                    | A sample node.js App using&nbsp;
+                    a(href='https://github.com/adamvr/MQTT.js/' target='_blank') mqtt.js
+                    | &nbsp;might look like this:
+                    br
+                    small Remember: You may replace
+                    code password
+                    small &nbsp; with a SHA1 hashed version of your actual password.
+                    pre.prettyprint
+                        | var mqtt = require('mqtt')
+                        | var client = mqtt.connect('mqtt://username:password@my.geofancy.com');
+                        br
+                        |client.subscribe('username/hello-world');
+                        |client.publish('username/hello-world', 'hello alltogether!');
+                        |client.on('message', function(topic, message) {
+                        |  console.log('Topic: ' + topic + ' Message: ' + message);
+                        |});

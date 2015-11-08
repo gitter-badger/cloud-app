@@ -1,0 +1,216 @@
+extends ../layout_map
+
+block content
+    script(src='/javascripts/fencelogExport.js')
+    link(rel='stylesheet', href='/stylesheets/slider.css')
+    link(rel='stylesheet', href='/stylesheets/ios7toggle.css')
+    link(rel='stylesheet', href='/stylesheets/geofences.css')
+    link(rel='stylesheet', href='/stylesheets/account.css')
+    script(type="text/javascript" src="/javascripts/bootstrap-slider.js")
+    script(type="text/javascript" src="/javascripts/geofences.js")
+    script(src='/javascripts/pwbox.js')
+    script(src='/javascripts/tfa.js')
+    script(type='text/javascript').
+        $(function(){$('.pagination').pagination({items:#{fencelogsSessions.pages.max},itemsOnPage:10,currentPage:#{fencelogsSessions.pages.current},cssStyle:'compact-theme'});});
+        $(document).ready(function(){$('.fencelog-details').colorbox({iframe:true,width:'800px',height:'80%',opacity:0.6,fixed:true});});
+        function askToRemoveFencelog(fencelogId){swal({title:'Remove Fencelog',text:'Would you really like to remove the selected Fencelog?',type:'warning',showCancelButton:true},function(){window.location.href='/account/fencelog/remove/'+fencelogId;})}
+        function askToRemoveSession(sessionId){swal({title:'Remove Session',text:'Would you really like to remove this session? The App using this session will have no access anymore.',type:'warning',showCancelButton:true},function(){window.location.href='/account/session/remove/'+sessionId;})}
+        function askToUnlinkApp(appId){swal({title:'Unlink App',text:'Would you really like to unlink this App? This App will not be able to access your Account anymore.',type:'warning',showCancelButton:true},function(){window.location.href='/account/app/unlink/'+appId;})}
+    div.container
+        div.row
+            div.col-md-4
+                if success
+                    div.alert.alert-success
+                        | #{success}
+                if failure
+                    div.alert.alert-danger
+                        | #{failure}
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Your Account
+                    div.panel-body
+                        div.row.row-account
+                            div.col-md-4
+                                div.avatar
+                                    center
+                                        div.avatar-div(style='background-image: url(https://www.gravatar.com/avatar/#{locals.account.avatar})')
+                                            img(src='https://www.gravatar.com/avatar/#{locals.account.avatar}')
+                            div.col-md-4.col-account-email
+                                //- p Username: 
+                                b #{locals.session.passport.user.username}
+                                br
+                                //- p Email: 
+                                | #{locals.session.passport.user.email}
+                        div.row.row-account#change-pw-div
+                            div.col-md-12#change-pw-div-form
+                                //- p Password:
+                                form(class="form-inline" role="form" method="post" action="/account")
+                                    div.form-group
+                                        input(type="hidden" name="changepw" value="true")
+                                        input(type="password" class="form-control" name="password1" placeholder="Password")
+                                        input(type="password" class="form-control" name="password2" placeholder="Repeat password")
+                                        button(type="submit" class="btn btn-default form-control") Change password
+                                div#tfa-div
+                                    label(for='toggle-tfa') Two-Factor Authentication
+                                    input.ios7toggle#tfa-toggle(type="checkbox" checked=locals.account.tfa==true)
+                                p
+                                    div.form-group
+                                        button.btn.btn-danger.form-control(onclick='$.colorbox({width:"500px",height:"320px",iframe:true,href:"/account/delete",opacity:0.6});') Delete Account
+                        div.row.row-account#change-pw-toggle
+                            div.col-md-4
+                                | &nbsp;
+                            div.col-md-8
+                                a#preferences-link(href='#' onclick='togglePwBox();') Open Preferences
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Active Sessions
+                    table.table
+                        each session, i in fencelogsSessions.sessions
+                            tr
+                                td
+                                    | #{session.created_at_formatted}
+                                td
+                                    | #{session.origin}
+                                td.td-action-right
+                                    a(href="#" onclick="askToRemoveSession('#{session.sessionId}')")
+                                        span.glyphicon.glyphicon-remove
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Linked Apps
+                    table.table
+                        each client, i in fencelogsSessions.clients
+                            tr
+                                td
+                                    | #{client.firstUse}
+                                td
+                                    | #{client.name}
+                                td.td-action-right
+                                    a(href="#" onclick="askToUnlinkApp('#{client.id}')") Unlink
+
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Plugins
+                    table.table
+                        tr
+                            td
+                                img(src="/images/marker-firefly.png" class="plugin-icon")
+                                | Firefly
+                            td.td-action-right
+                                if fencelogsSessions.plugins.firefly
+                                    a(href="/account/plugin/firefly/deactivate") Deactivate
+                                else
+                                    a(href="/account/plugin/firefly/activate") Activate
+                        tr
+                            td
+                                img(src="/images/marker-yelp.png" class="plugin-icon")
+                                | Yelp
+                            td.td-action-right
+                                if fencelogsSessions.plugins.yelp
+                                    a(href="/account/plugin/yelp/deactivate") Deactivate
+                                else
+                                    a(href="/account/plugin/yelp/activate") Activate
+
+            div.col-md-8#geofences-box
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title Geofences
+                            a(href="#" class="panel-title-link" onclick="showMap(this, null, 20)" id="showHideMap") Add
+                    div.panel-body
+                        div#add-map-div
+                            div#map-canvas
+                            div#radius-slider-div
+                                input(type="text" id="radius-slider" data-slider-id="radius-slider" data-slider-min="25" data-slider-max="250" data-slider-step="1" data-slider-value="50")
+                            div.form-group#add-properties-div
+                                input(type="hidden" name="geofenceId")
+                                input.add-map-element.form-control#locationId(type="text" placeholder="Custom Location ID")
+                            div.add-map-element
+                                div
+                                    p#section-header HTTP Push
+                                div.add-geofence-trigger-div
+                                    | Trigger on arrival
+                                    input.ios7toggle#trigger-arrival-enabled(type="checkbox" checked)
+                                    div.input-group.add-geofence-input-group
+                                        div.input-group-btn
+                                            hidden#trigger-arrival(value="0")
+                                            button#trigger-arrival-method(type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown") POST
+                                                span.caret
+                                            ul.dropdown-menu
+                                                li
+                                                    a(onclick="$('#trigger-arrival').val('0');$('#trigger-arrival-method').html('POST&nbsp;<span class=\"caret\"></span>');") POST
+                                                li
+                                                    a(onclick="$('#trigger-arrival').val('1');$('#trigger-arrival-method').html('GET&nbsp;<span class=\"caret\"></span>');") GET
+                                        input#trigger-arrival-url(type="text" class="form-control")
+                                div.add-geofence-trigger-div
+                                    | Trigger on leave
+                                    input.ios7toggle#trigger-leave-enabled(type="checkbox" checked)
+                                    div.input-group.add-geofence-input-group
+                                        div.input-group-btn
+                                            hidden#trigger-leave(value="0")
+                                            button#trigger-leave-method(type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown") POST
+                                                span.caret
+                                            ul.dropdown-menu
+                                                li
+                                                    a(onclick="$('#trigger-leave').val('0');$('#trigger-leave-method').html('POST&nbsp;<span class=\"caret\"></span>');") POST
+                                                li
+                                                    a(onclick="$('#trigger-leave').val('1');$('#trigger-leave-method').html('GET&nbsp;<span class=\"caret\"></span>');") GET
+                                        input#trigger-leave-url(type="text" class="form-control")
+                                div.add-geofence-trigger-div
+                                    | HTTP Basic Authentication
+                                    input.ios7toggle#basic-auth-enabled(type="checkbox")
+                                    div.form-group
+                                        input.form-control#basic-auth-username(type="text" class="form-control" placeholder="Username")
+                                        input.form-control#basic-auth-password(type="password" class="form-control" placeholder="Password")
+                                div.form-group
+                                    button.btn.form-control.btn-success(onclick="saveGeofence();") Save
+
+                        div#geofences-div
+                            center
+                                img(src="/images/ajax-loader.gif")
+            div.col-md-4
+            div.col-md-8
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title Fencelog
+                            div.pagination.pull-right
+
+                    table.table
+                        tr
+                            td
+                                b Location ID
+                            td
+                                b Time
+                            td
+                        each fencelog, i in fencelogsSessions.fencelogs
+                            - var eventType = (fencelog.eventType === "enter" ? "enter" : "exit")
+                                tr(class="fencelog-row-#{eventType}")
+                                    td
+                                        if fencelog.locationId
+                                            img(src="/images/#{fencelog.icon}", class="fencetype-icon")
+                                            if fencelog.eventType === "enter"
+                                                | &nbsp;
+                                                b Enter &nbsp;
+                                            else if fencelog.eventType ===  "exit"
+                                                | &nbsp;
+                                                b Exit &nbsp;
+                                            else
+                                                | &nbsp;
+                                            a(href="/location/#{fencelog._id}" class="fencelog-details") #{fencelog.locationId}
+                                        else
+                                            a(href="/location/#{fencelog._id}" class="fencelog-details") No location Id specified
+                                    td #{fencelog.created_at_formatted}
+                                    td
+                                        a(href="/location/#{fencelog._id}" class="fencelog-details") Show Details
+                                    td
+                                        a(href="#" onclick="askToRemoveFencelog('#{fencelog._id}')")
+                                            span.glyphicon.glyphicon-remove
+                  div.panel.panel-default
+                    div.panel-heading
+                      h3.panel-title Retrieve your Data
+                    table.table
+                      tr
+                        td
+                          center
+                            button.btn(onclick='$.colorbox({width:"400px",height:"110px",iframe:true,href:"/account/export/fencelogs?export=csv",opacity:0.6});') All Fencelogs in CSV-Format via E-Mail
+                            | &nbsp;
+                            button.btn(onclick='$.colorbox({width:"400px",height:"110px",iframe:true,href:"/account/export/fencelogs?export=json",opacity:0.6});') All Fencelogs in JSON-Format via E-Mail
+    script(type="text/javascript") createSlider(25, 250); $('#radius-slider').hide()

@@ -1,0 +1,62 @@
+div.navbar.navbar-inverse.navbar-fixed-top
+    div.container
+        div.navbar-header
+            input(type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" id="navbar-toggle-logo")
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+            div.app-icon &nbsp;
+            a(class="navbar-brand" href="/") Geofancy
+        div.navbar-collapse.collapse
+            ul.nav.navbar-nav
+                li(class=(locals.pathname === '/' ? 'active' : ''))
+                    a(href="/") Home
+
+                if locals.session.passport.user
+                  li.dropdown(class=(locals.pathname === '/account' || locals.pathname === '/account/schedule' || locals.pathname === '/account/mqtt' ? ' active ac1' : ' ac1'))
+                    a(href="#" class="dropdown-toggle" data-toggle="dropdown")
+                      | Account
+                      b.caret
+                    ul.dropdown-menu
+                      li
+                        a(href="/account") Details
+                      li
+                        a(href="/account/schedule") Schedule
+                      li
+                        a(href='/account/mqtt') MQTT
+
+                li(class=(locals.pathname === '/developer' ? 'active' : ''))
+                    a(href="/developer") Developer
+
+                li(class='dropdown' + ((locals.pathname === '/support') ? ' active ac1' : ''))
+                    a(href="#" class="dropdown-toggle" data-toggle="dropdown")
+                        | Support
+                        b.caret
+                    ul.dropdown-menu
+                        li
+                            a(href="http://wiki.geofancy.com") FAQ
+                        li(class=(locals.pathname === '/support' ? 'active' : ''))
+                            a(href="/support") Support / Feedback
+                  li(class=(locals.pathname === '/legal' ? 'active' : ''))
+                      a(href="/legal") Legal
+
+            if !locals.session.passport.user && locals.pathname === '/login'
+                form(class="navbar-form navbar-right")
+                    button(type="button" class="btn btn-success btn-createaccount" onclick="window.location='/signup'") Create Account
+            else if !locals.session.passport.user && locals.pathname === '/signup'
+                form(class="navbar-form navbar-right")
+                    button(type="button" class="btn btn-default" onclick="window.location='/login'") Sign in
+            else if !locals.session.passport.user && (locals.pathname !== '/login' && locals.pathname !== '/signup')
+                script(src="/javascripts/login-timezone.js")
+                form(class="navbar-form navbar-right" method="post" action="/login")
+                    div.form-group
+                        input(name="username" id="gf-input-username" type="text" placeholder="Username" class="form-control")
+                    div.form-group
+                        input(name="password" id="gf-input-password" type="password" placeholder="Password" class="form-control")
+                    input#timezone(type="hidden" name="timezone")
+                    button(type="submit" class="btn btn-default") Sign in
+                    button(type="button" class="btn btn-success btn-createaccount" onclick="window.location='/signup'") Create Account
+            else
+                form(class="navbar-form navbar-right" method="get" action="/logout")
+                    label.navbar-greeting Welcome, #{locals.session.passport.user.username}
+                    button(class="btn btn-default") Log out

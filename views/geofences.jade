@@ -1,0 +1,20 @@
+extends layout_map
+
+block content
+    link(rel='stylesheet', href='/stylesheets/slider.css') 
+    script(type="text/javascript" src="/javascripts/bootstrap-slider.js")
+    script(type="text/javascript" src="/javascripts/geofences.js")
+    div.container
+        div.row
+            div.col-lg-12
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title Geofences
+                            a(href="#" class="panel-title-link" onclick="showMap(this)") Add
+                    div.panel-body
+                        div#add-map-div
+                            div#map-canvas
+                            input(type="text" value="4" id="radius-slider" data-slider-id="radius-slider")
+                        div#geofences-div
+                            | No Geofences existings
+    script(type="text/javascript") $('#radius-slider').slider(); $('#radius-slider').hide();

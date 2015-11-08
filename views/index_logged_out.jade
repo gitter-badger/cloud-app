@@ -1,0 +1,41 @@
+extends layout
+
+block content
+  link(rel='stylesheet' href='/stylesheets/loggedout.css')
+  div.row
+    div.col-md-4
+        div.panel.panel-default
+          div.panel-heading Automation par excellence
+          div.panel-body
+            | Imagine you're coming home, won't it be great to automatically switch your Lights On?
+            br
+            | May be you'll leave your house while in a hurry and forget to switch your lights off.
+            br
+            br
+            | No problem: Just configure your home-sweet-home as a geofence and let Geofancy do the rest! By calling a HTTP-URL (either via GET or POST request) you mal call your own WebService which then may trigger the desired operations.
+        div.panel.panel-default
+          div.panel-heading oAuth v2 API, Socket.IO, and more...
+          div.panel-body
+            | Geofancy is featuring some real awesome technologies to keep you connected to your data.
+            br
+            br
+            | Wether you're into Home-Automation or just want to see where you check in and out, Geofancy is the tool of your choice.
+            br
+            br
+            | And if you decide to quit using our service: No worries, just delete your Account and all your data get's erased, forever, we promise.
+        div#apple-badge-div
+          a(href='http://get.geofancy.com')
+            img(id='apple-badge' src='/images/badge.png')
+    div.col-md-4
+      div#gf-iphone
+    div.col-md-4
+      div.panel.panel-default
+        div.panel-heading Completely free, forever, no strings attached!
+        div.panel-body
+          | Geofancy just calls a HTTP-URL and optionally displays the Server's HTTP-Response.
+          br
+          br
+          | If your still in need of a reliable WebService to handle your requests, be sure to check out https://my.geofancy.com. Currently you may log your geofences, but we'll add other neat features pretty soon ;-)
+      div.panel#twitter-div
+          a.twitter-timeline(data-dnt="true" href="https://twitter.com/Geofancy" data-widget-id="511459393175420928") Tweets by @Geofancy
+          script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");

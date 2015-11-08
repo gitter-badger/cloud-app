@@ -1,0 +1,34 @@
+extends layout_signup
+
+block content
+    if result === 'user_existing'
+        div.container.createaccount-container
+            center
+                h3 Oooops.
+                p A User with the same Username or Email address is already present on our system. Please try again.
+                | If you've lost your password / Email / Username you may recover it 
+                a(href='/youforgot') here
+                |.
+
+    if !result || result === 'user_existing'
+        div.container.createaccount-container
+            form(role="form" class="form-createaccount" method="post" action="/signup" data-validate="parsley" novalidate)
+                center
+                    h2(class="form-createaccount-heading") Create Account
+                input(name="username" type="text" class="form-control" placeholder="Username" data-remote="/api/username" data-remote-method="post" required autofocus)
+                input(name="email" type="text" class="form-control" placeholder="Email address" data-type="email" required)
+                input(name="password" type="password" class="form-control" placeholder="Password" required)
+                center
+                    small By signing up you agree to our  
+                        a(href="/legal" target="_blank") Terms of Service
+                        | .
+                button(class="btn btn-lg btn-primary btn-block" type="submit") Sign up
+                br
+                button(class="btn btn-lg btn-default btn-block btn-facebook" onclick="window.location='/auth/facebook'" type="button") Sign up via Facebook
+                button(class="btn btn-lg btn-default btn-block btn-twitter" onclick="window.location='/auth/twitter'" type="button") Sign up via Twitter
+    else if result === 'success'
+        div.container.createaccount-container
+            center
+                h3 Account created successfully!
+                p You may now log in by using the provided credentials
+            

@@ -1,0 +1,13 @@
+extends ../../layout_noheader
+
+block content
+  script(src='/javascripts/fencelogExport.js')
+  script(type='text/javascript').
+    $(document).ready(function(){
+      exportAllFencelogs();
+    });
+  div.contents
+    center
+      img(src='/images/ajax-loader-h.gif')
+      br
+      | Please wait as we're preparing your Fencelog export...

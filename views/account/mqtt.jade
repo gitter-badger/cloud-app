@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+  script(src='/javascripts/moment.min.js')
+  script(src='/javascripts/mqtt.js')
+  div.container
+    div.row
+      div.col-md-4
+        div.panel.panel-primary
+          div.panel-heading 
+            h3.panel-title Topics
+          table.table#topics-table
+            tr
+              td
+                b Loading MQTT Topics...
+              td
+                &nbsp;
+
+        div.panel.panel-primary
+          div.panel-heading
+            h3.panel-title Dispatch Message
+          table.table
+            tr
+              td
+                input.form-control#topic-input(placeholder='Topic')
+            tr
+              td
+                textarea.form-control#message-input(rows='3' placeholder='Message')
+            tr
+              td
+                select.form-control#qos-input
+                  option(value='0') QoS 0
+                  option(value='1') QoS 1
+            tr
+              td
+                button.btn.btn-primary.pull-right(onclick='dispatchMessage();') Dispatch Message
+
+      div.col-lg-8
+        div.panel.panel-default
+          div.panel-heading 
+            h3.panel-title Messages
+              div.pagination.pull-right
+          table.table#messages-table
+            tr
+              td Please select topic from left hand menu

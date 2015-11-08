@@ -1,0 +1,46 @@
+extends ../layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/calendar.css')
+  script(src='/javascripts/underscore.js')
+  script(src='/javascripts/calendar.js')
+  script(type='text/javascript').
+    $(document).ready(function(){
+      var calendar = $("#calendar").calendar(
+      {
+        tmpl_path: "/templates/calendar/",
+        events_source: "/api/schedule",
+        onAfterViewLoad: function(view) {
+          $('.calendar-title h3').text(this.getTitle());
+          $('.btn-group button').removeClass('active');
+          $('button[data-calendar-view="' + view + '"]').addClass('active');
+        }
+      });
+      $('.btn-group button[data-calendar-nav]').each(function() {
+        var $this = $(this);
+        $this.click(function() {
+          calendar.navigate($this.data('calendar-nav'));
+        });
+      });
+      $('.btn-group button[data-calendar-view]').each(function() {
+        var $this = $(this);
+        $this.click(function() {
+          calendar.view($this.data('calendar-view'));
+        });
+      });
+    });
+  div.calendar-title
+    h3
+  div.calendar-buttons-div
+    div.pull-right.form-inline
+      div.btn-group.calendar-btn-group
+        button.btn.btn-primary(data-calendar-nav="prev") Prev
+        button.btn(data-calendar-nav="today") Today
+        button.btn.btn-primary(data-calendar-nav="next") Next
+      div.btn-group.calendar-btn-group
+        button.btn.btn-warning(data-calendar-view="year") Year
+        button.btn.btn-warning.active(data-calendar-view="month") Month
+        button.btn.btn-warning(data-calendar-view="week") Week
+        button.btn.btn-warning(data-calendar-view="day") Day
+
+  div.calendar-div#calendar

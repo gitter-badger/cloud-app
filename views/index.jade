@@ -1,0 +1,106 @@
+extends layout_map
+
+block content
+    //- if welcome
+    //-     link(rel='stylesheet', href='/stylesheets/colorbox.css')
+    //-     script(type="text/javascript", src="/javascripts/jquery.colorbox.min.js")
+    //-     script(type="text/javascript")
+    //-         $(document).on('map_initialized', function() {
+    //-             $.colorbox({html:"<h1>Welcome to Geofancy</h1><p></p>", transition: 'none', opacity: 0.6});
+    //-         });
+    div#map-canvas
+        if !locals.session.passport.user
+            script(type="text/javascript").
+                $(document).on('user_location_initialized', function() {
+                    window.map.setCenter(window.userMarker.position);
+                    setTimeout(function(){
+                        window.map.setZoom(15);
+                    }, 2000);
+                });
+        else
+            script(type="text/javascript").
+                $(document).on('map_initialized', function() {
+                    var fencelogs = new Array(#{fencelogs});
+                    window.fencelogs = fencelogs;
+                    for (var i = 0; i < fencelogs.length; i++) {
+                        var marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(fencelogs[i][1], fencelogs[i][0]),
+                            map: window.map,
+                            icon: '/images/marker-universal.png'
+                        });
+                        marker.id = i;
+                        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                            return function() {
+                                //- window.location.href = '/location/' + window.fencelogs[marker.id][2];
+                                $.colorbox({iframe:true,width:'800px',height:'80%',opacity:0.6,fixed:true,href:'/location/' + window.fencelogs[marker.id][2]});
+                            }
+                        })(marker, i));
+                    }
+                });
+                $(document).on('user_location_initialized', function() {
+                    window.map.setCenter(window.userMarker.position);
+                    window.map.setZoom(15);
+                });
+        if locals.session.passport.user
+            if yelpLocations
+                script(type="text/javascript").
+                    $(document).on('user_location_initialized', function(){
+
+                        var category = 'Food';
+                        var uri = '/plugin/yelp/' + window.userPosition.lon + '/' + window.userPosition.lat + '/' + category;
+                        var geocoder = new google.maps.Geocoder();
+
+                        function geocodeAddress(address, id) {
+                            geocoder.geocode({'address': address}, function(results, status) {
+                                if (status == google.maps.GeocoderStatus.OK) {
+                                    var marker = new google.maps.Marker({
+                                        position: results[0].geometry.location,
+                                        map: window.map,
+                                        icon: '/images/marker-yelp.png',
+                                    });
+                                    marker.id = id;
+                                    google.maps.event.addListener(marker, 'click', (function(marker, id) {
+                                        return function() {
+                                            //- $.colorbox({iframe:true,width:'80%',height:'80%',opacity:0.6,fixed:true,href:window.yelpUrls[parseInt(marker.id)]});
+                                            if(confirm('Would you like to open "' + window.yelpUrls[parseInt(marker.id)] + "' in a new window?")) {
+                                                window.open(window.yelpUrls[parseInt(marker.id)]);
+                                            }
+                                        }
+                                    })(marker, id));
+                                }
+                            });
+                        }
+                        $.getJSON(uri, function(data) {
+                            if(data.businesses) {
+                                window.yelpUrls = new Array();
+                                for (var i = 0; i < data.businesses.length; i++) {
+                                    window.yelpUrls.push(data.businesses[i].mobile_url);
+                                    var address = '';
+                                    for (var j = 0; j < data.businesses[i].location.display_address.length; j++) {
+                                        address += data.businesses[i].location.display_address[j] + ',';
+                                    }
+                                    geocodeAddress(address, i);
+                                }
+                            }
+                        });
+                    });
+            if ffLocations
+                script(type="text/javascript").
+                    $(document).on('map_initialized', function() {
+                        var ffLocations = new Array(#{ffLocations});
+                        window.ffLocations = ffLocations;
+                        for (var i = 0; i < ffLocations.length; i++) {
+                            var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(ffLocations[i][0], ffLocations[i][1]),
+                                map: window.map,
+                                icon: '/images/marker-firefly.png'
+                            });
+                            marker.id = ffLocations[i][2];
+                            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                                return function() {
+                                    //- window.location.href = '/plugin/firefly/' + window.ffLocations[parseInt(marker.id) - 1000][2];
+                                    $.colorbox({iframe:true,width:'800px',height:'80%',opacity:0.6,fixed:true,href:'/plugin/firefly/' + window.ffLocations[parseInt(marker.id) - 1000][2]});
+                                }
+                            })(marker, i));
+                        }
+                    });

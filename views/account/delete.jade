@@ -1,0 +1,9 @@
+extends ../layout_noheader
+
+block content
+    script(src="/javascripts/delete_account.js")
+    div.content
+        div.delete-account-msg
+            p Really delete Account? This will take place immediately and is irreversible. All your data, Fencelogs and oAuth v2 Clients will be lost! You've been warned.
+            button.btn.btn-success(onclick="cancelDelete();") No
+            button.btn.btn-danger(onclick="confirmDelete('#{locals.session.passport.user._id}')") Yes

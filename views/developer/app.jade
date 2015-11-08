@@ -1,0 +1,55 @@
+extends layout
+
+block content
+    if save
+        script(type="text/javascript").
+            $(document).ready(function(){
+                parent.$.colorbox.close();
+                parent.window.location.href='/developer';
+            });
+    else
+        div.container.edit-app-container
+            if app
+                h1 Edit App
+            else
+                h1 Create new App
+            div
+                if app
+                    form(role="form" method="post" action="/developer" data-validate="parsley" novalidate)
+                        input(type="hidden" name="appid" value="#{app._id}")
+                        table.table
+                            tr
+                                td Name
+                                td
+                                    input(type="text" name="name" placeholder="Your App's readable name" value="#{app.name}" class="form-control" required autofocus)
+                            tr
+                                td Redirect URI
+                                td
+                                    input(type="text" name="redirecturi" placeholder="Default: urn:ietf:wg:oauth:2.0:oob" value="#{app.redirectUri}" class="form-control")
+                            tr
+                                td Client ID
+                                td
+                                    input(type="text" value="#{app.clientId}" class="form-control" readonly)
+                            tr
+                                td Client Secret
+                                td
+                                    input(type="text" value="#{app.clientSecret}" class="form-control" readonly)
+                            tr
+                                td
+                                td 
+                                    button(class="btn btn-lg btn-primary btn-block" type="submit") Save App
+                else
+                    form(role="form" method="post" action="/developer" data-validate="parsley" novalidate)
+                        table.table
+                            tr
+                                td Name
+                                td
+                                    input(type="text" name="name" placeholder="Your App's readable name" class="form-control" required autofocus)
+                            tr
+                                td Redirect URI
+                                td
+                                    input(type="text" name="redirecturi" placeholder="Default: urn:ietf:wg:oauth:2.0:oob" class="form-control")
+                            tr
+                                td
+                                td 
+                                    button(class="btn btn-lg btn-primary btn-block" type="submit") Create App

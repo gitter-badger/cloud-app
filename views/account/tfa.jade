@@ -1,0 +1,63 @@
+extends ../layout_noheader
+
+block content
+  link(rel='stylesheet' href='/stylesheets/tfa.css')
+  script(src='/javascripts/tfa.js')
+
+  div.row.row-loader
+    div.col.col-md-6
+      img(src='/images/ajax-loader.gif')
+      br
+      br
+      | Activating your 2FA...
+      br
+      | Please be patient, this shall only take a couple of seconds...
+
+  div.row.row-error
+    div.col.col-md-6
+      div.panel.panel-danger
+        div.panel-heading Wrong Token
+        div.panel-body Please check your Token and try again.
+
+  div.row.row-tfa
+    div.col.col-md-6
+      div.panel.panel-default
+        div.panel-heading Two-Factor Authentication
+        div.panel-body
+          | Open your desired App, e.g. Google Authenticator, scan this QR Code and enter the generated Token into the Field below.
+          br
+          div#tfa-img-div
+            img(src='#{tfa.uri}')
+          form#tfa-form(name='enter-token')
+            div.input-group
+              input#tfa-secret(type='hidden' value='#{tfa.secret}')
+              input#tfa-token.form-control(type='text' placeholder='Token')
+              span.input-group-btn
+                button.btn.btn-default(type='button' onclick='activateTfa();') Activate 2FA
+
+  //- div.row.row-tfa
+  //-   div.col.col-md-6
+  //-     div.panel.panel-default
+  //-       div.panel-heading Two-Factor Authentication
+  //-       div.panel-body Authentication using a second security factor is currently
+  //-         b  #{locals.session.passport.user.tfa.enabled === true ? 'enabled' : 'disabled'}.
+  //-         br
+  //-         | You may provide a mobile phone number to which a SMS message will be sent, containing your Two-Factor Authentication code.
+  //-         br
+  //-         br
+  //-         form#tfa-form(name='send-sms')
+  //-           div.input-group
+  //-               input.form-control#tfa-mobile(type='text' placeholder='+61 402 123456')
+  //-               span.input-group-btn
+  //-                 button.btn.btn-default(type='button' onclick='sendSms();') Send SMS
+
+  //- div.row.row-code
+  //-   div.col.col-md-6
+  //-     div.panel.panel-default
+  //-       div.panel-heading Two-Factor Authentication
+  //-       div.panel-body Please wait for your Two-Factor Authentication Code to arrive, then enter it here:
+  //-         form#code-form
+  //-           div.input-group
+  //-             input.form-control#tfa-code(type='text')
+  //-             span.input-group-btn
+  //-               button.btn.btn-default(type='button' onclick='validateCode();') Validate Code

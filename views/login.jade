@@ -1,0 +1,21 @@
+extends layout_signup
+
+block content
+    script(src="/javascripts/login-timezone.js")
+    div.container.createaccount-container
+        form(role="form" class="form-createaccount" method="post" action="/login" data-validate="parsley" novalidate)
+            center
+                h2(class="form-createaccount-heading") Login to Account
+                if message
+                    p
+                        font(color="red") #{message}
+            input(name="username" type="text" class="form-control" placeholder="Username" required autofocus)
+            input(name="password" type="password" class="form-control" placeholder="Password" required)
+            button(class="btn btn-lg btn-primary btn-block" type="submit") Login
+            button(class="btn btn-lg btn-default btn-block" onclick="window.location='/youforgot';" type="button") Lost password
+            br
+            input#timezone(type="hidden" name="timezone")
+            button(class="btn btn-lg btn-default btn-block btn-facebook" onclick="window.location='/auth/facebook'" type="button") Login via Facebook
+            button(class="btn btn-lg btn-default btn-block btn-twitter" onclick="window.location='/auth/twitter'" type="button") Login via Twitter
+
+            

@@ -1,0 +1,40 @@
+extends ../../layout_map_noheader
+
+block content
+    div.container
+        div.row-small
+            div.col-md-4
+                div.panel.panel-primary
+                    div.panel-heading
+                        h3.panel-title Map
+                    div.panel-body
+                        div#location-map-div
+                            div#map-canvas
+            div.col-lg-8
+                div.panel.panel-default
+                    div.panel-heading
+                        h3.panel-title
+                            | #{location.name} &bull; #{location.description}
+                    div.panel-body
+                        table.table
+                            for headline, i in location.event_data.headlines
+                                tr
+                                    td 
+                                        | #{headline}
+                                        br
+                                        small #{location.event_data.subtitles[i]}
+
+    if location
+        script(type="text/javascript").
+            var $ = window.parent.$;
+            $(document).on('map_initialized', function(){
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(#{location.location.lat},#{location.location.lng}),
+                    map: window.map,
+                    title: '#{location.name}',
+                    icon: '/images/marker-firefly.png'
+                });
+                window.map.setCenter(marker.position);
+                window.map.setZoom(15);
+                window.map.setOptions({draggable:false,zoomControl:false,scrollwheel:false,disableDoubleClickZoom:true});
+            });

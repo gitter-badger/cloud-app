@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  link(rel='stylesheet' href='/stylesheets/tfa.css')
+  script(src='/javascripts/tfa.js')
+
+  div.div-tfa
+    div.row.row-error
+      div.col.col-md-6.row-error-login
+        div.panel.panel-danger
+          div.panel-heading Wrong Token
+          div.panel-body Please check your Token and try again.
+
+    div.row.row-tfa
+      div.col.col-md-6.row-tfa-login
+        div.panel.panel-default
+          div.panel-heading Two-Factor Authentication
+          div.panel-body
+            | Please open your Two-Factor Authentication App, e.g. Google Authenticator and enter the 2FA Token in the field below.
+            br
+            form#tfa-form(name='enter-token')
+              div.input-group
+                input#tfa-token.form-control(type='text' placeholder='Token')
+                span.input-group-btn
+                  button.btn.btn-default(type='button' onclick='unlockAccount();') Unlock Account

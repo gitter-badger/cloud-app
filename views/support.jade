@@ -1,0 +1,24 @@
+extends layout_signup
+
+block content
+    //- if result === 'success'
+    //-     div.container.createaccount-container
+    //-         center
+    //-             h3 Support Request sent successfully!
+    //-             p We'll just get it done as soon as possible...
+    //- else
+    //-     div.container.createaccount-container
+    //-         form(role="form" class="form-createaccount" method="post" action="/support" data-validate="parsley" novalidate)
+    //-             center
+    //-                 h2 Support Request
+    //-             input(name="username" type="text" class="form-control" placeholder="Username")
+    //-             input(name="email" type="text" class="form-control" placeholder="Email address" data-type="email" required autofocus)
+    //-             textarea(name="message" class="form-control textarea-support-message" placeholder="Your message / description of your problem" required)
+    //-             button(class="btn btn-lg btn-primary btn-block" type="submit") Send Support Request
+    script(type='text/javascript')
+        | $(document).ready(function(){window.location='http://support.geofancy.com';});
+    div.container.createaccount-container
+        center
+            h2 Please wait while we're redirecting you...
+            small
+                a(href='http://support.geofancy.com') (or click here if you're not being redirected)
