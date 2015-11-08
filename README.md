@@ -3,10 +3,10 @@
 
 ## Preamble
 
-I'm open sourcing this sideproject of mine as I'm not enough time to actively care about it and due to the high number of requests I've got from the community, it feels about right to make further work to it possible.
+I'm open sourcing this side-project of mine as I'm not enough time to actively care about it and due to the high number of requests I've got from the community, it feels about right to make further work to it possible.
 
 #### So you're going open source now, what about my data, is it also going open source?
-No, no, no. Of course not, you're data is still storned on the Geofancy servers and it will stay there until further notice. No third party will have access to your data.
+No, no, no. Of course not, you're data is still stored on the Geofancy servers and it will stay there until further notice. No third party will have access to your data.
 
 ## Technologies used
 
@@ -15,7 +15,7 @@ For the numerous modules used take a look at the `package.json`.
 
 ## Development
 
-To get started with this app first create a copt of `config.exmple.js` and name it `config.js` then customize this config to suit your needs, the rest is just convenient node.js stuff.
+To get started with this app first create a copt of `config.example.json` and name it `config.json` then customize this config to suit your needs, the rest is just convenient node.js stuff.
 
 ```
 npm install
@@ -26,7 +26,7 @@ That's all folks.
 
 ## Deployment
 
-To date I'm going to manually deploy releases to production, I'm planning on migratin this project to Travis-CI so CI can do the deployments for me.
+To date I'm going to manually deploy releases to production, I'm planning on migrating this project to Travis-CI so CI can do the deployments for me.
 
 #### So how do I find out what version is currently running on my.geofancy.com?
 Too easy! Just do any arbitrary HTTP request to any endpoint (e.g. GET https://my.geofancy.com) and look at the response headers: `X-Git-Revision: 7faa150`.
